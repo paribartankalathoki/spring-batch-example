@@ -1,6 +1,7 @@
 package com.kalathoki.learning.batchprocessing.config;
 
 import com.kalathoki.learning.batchprocessing.entity.CustomerDetails;
+import com.kalathoki.learning.batchprocessing.entity.Student;
 import com.kalathoki.learning.batchprocessing.repository.CustomerDetailsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -14,11 +15,17 @@ import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.json.JacksonJsonObjectReader;
+import org.springframework.batch.item.json.JsonItemReader;
+import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+
+import java.util.ArrayList;
 
 /**
  * @author:- Paribartan Kalathoki
@@ -45,6 +52,19 @@ public class SpringBatchConfig {
         itemReader.setLinesToSkip(1);
         itemReader.setLineMapper(lineMapper());
         return itemReader;
+    }
+
+
+    public JsonItemReader<Student> jsonItemReader() {
+        ArrayList<String> data = new ArrayList<>();
+        data.add("Hello Ram");
+        data.add("Hello Shyam");
+        data.add("Hello Hari");
+        return new JsonItemReaderBuilder<Student>()
+                .jsonObjectReader(new JacksonJsonObjectReader<>(Student.class))
+                .resource(new ClassPathResource("data.json"))
+                .name("studentJsonItemReader")
+                .build();
     }
 
     private LineMapper<CustomerDetails> lineMapper() {
